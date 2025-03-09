@@ -16,12 +16,12 @@ element.
 Binary operations take two source registers and place the result of the operation in a third
 destination register.
 
-> \[binop] \[op] \[rA] \[rB] \[rC]
+> \[binop] \[op] \[rA] \[rB] \[rC]  
 > rC = op(rA, rB)
 
 ### Immediate Operations
 Immediate operations take an immediate value and a source register and places the result of the
 operation back into the source register.
 
-> \[immop] \[op] \[imm] \[rA]
+> \[immop] \[op] \[imm] \[rA]  
 > rA = op(rA, imm)
