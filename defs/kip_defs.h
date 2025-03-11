@@ -6,7 +6,7 @@ typedef enum {
 } FormatSpecifier;
 
 typedef enum {
-	ADD, SUB, MUL,
+	ADD, SUB, MUL, LOD,
 } Operations;
 
 #endif /* KIP_DEFS_H */

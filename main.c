@@ -1,34 +1,51 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "defs/cli.h"
+#include "defs/dynarr.h"
 #include "defs/emulator.h"
-#include "defs/kip_defs.h"
 
 
-int instructions[] = {
-	IMMOP, ADD, 4, 0,
-	IMMOP, ADD, 3, 1,
-	BINOP, MUL, 0, 1, 2,
-	HALT
-};
+DynamicArray instructions;
 
-#define REG_COUNT 4
-int registers[REG_COUNT];
+#define REGISTER_COUNT 4
+int registers[REGISTER_COUNT];
 
 int main(int argc, char *argv[]) {
 
-	EmulationResult e = emulate(instructions, sizeof(instructions) / sizeof(int), registers, REG_COUNT);
+	FILE *output = stdout;
+	int flags;
+	parseArguments(argc, argv, &instructions, &output, &flags);
 
-	if (e == EMULATION_ERROR) {
-		fprintf(stderr, "There was an error running the program\n");
-		exit(EXIT_FAILURE);
+	EmulationResult e;
+
+	if (flags) {
+		// perform emulation steps rather than full emulation, so we can dump register data
+
+		e = EMULATOR_STEP_DONE;
+		while (e == EMULATOR_STEP_DONE) {
+			e = emulationStep(&instructions.values, instructions.count, registers, REGISTER_COUNT);
+			fprintf(output, "regs: ");
+			for (int i = 0; i < REGISTER_COUNT; ++i) {
+				fprintf(output, "[ %02d ]", registers[i]);
+			}
+			fprintf(output, "\n");
+		}
+
+	} else {
+		// perform emulation in one go
+		e = emulate( instructions.values, instructions.count, registers, REGISTER_COUNT);
 	}
+	
 
-	for (int i = 0; i < REG_COUNT; ++i) {
-		printf("[ %02d ]", registers[i]);
+	fprintf(output, "res: %s\n", (e == EMULATION_OK) ? "success" : "fail");
+
+	fprintf(output, "regs: ");
+	for (int i = 0; i < REGISTER_COUNT; ++i) {
+		fprintf(output, "[ %02d ]", registers[i]);
 	}
+	fprintf(output, "\n");
 
-	printf("\n");
-
+	fclose(output);
 	exit(EXIT_SUCCESS);
 }
